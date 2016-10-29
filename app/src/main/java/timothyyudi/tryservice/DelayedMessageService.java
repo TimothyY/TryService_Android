@@ -2,44 +2,48 @@ package timothyyudi.tryservice;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.content.Context;
 import android.os.Handler;
-import android.util.Log;
+import android.support.v4.content.LocalBroadcastManager;
 import android.widget.Toast;
 
 public class DelayedMessageService extends IntentService {
-
-    public static final String EXTRA_MESSAGE = "message";
-    private Handler handler;
 
     public DelayedMessageService() {
         super("DelayedMessageService");
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        handler = new Handler();
-        return super.onStartCommand(intent, flags, startId);
+    protected void onHandleIntent(Intent intent) {
+        showText("Doing something");
     }
 
-    @Override
-    protected void onHandleIntent(Intent intent) {
+    static final public String DELAYEDMESSAGESERVICE_ACTION = "timothyyudi.tryservice.DELAYEDMESSAGESERVICE_ACTION";
+
+    private void showText(final String text) {
         synchronized (this) {
             try {
-                wait(3000);
+                wait(5000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
-        showText(intent.getStringExtra(EXTRA_MESSAGE));
-    }
-
-    private void showText(final String text) {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(getApplicationContext(), text, Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
+                broadcaster.sendBroadcast(new Intent(DELAYEDMESSAGESERVICE_ACTION));
             }
         });
     }
+
+    private Handler handler;
+    LocalBroadcastManager broadcaster;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        handler = new Handler();
+        broadcaster = LocalBroadcastManager.getInstance(this);
+    }
+
 }
