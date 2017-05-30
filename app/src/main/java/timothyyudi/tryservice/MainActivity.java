@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,21 +32,14 @@ public class MainActivity extends AppCompatActivity {
                 //for delayed message service
                 Intent intent = new Intent(mCtx, DelayedMessageService.class);
                 startService(intent);
+                btnTriggerService.setText("Service is now doing something");
             }
         });
 
         broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-
-                btnTriggerService.setText("Service is done");
-                final Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        btnTriggerService.setText("Trigger Service");
-                    }
-                }, 2000);
+                btnTriggerService.setText("Service is done doing something, retry?");
             }
         };
     }
@@ -63,4 +57,5 @@ public class MainActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
         super.onStop();
     }
+
 }
