@@ -16,7 +16,7 @@ public class MainActivity extends AppCompatActivity {
 
     Button btnTriggerService;
     Context mCtx;
-    BroadcastReceiver broadcastReceiver;
+    BroadcastReceiver broadcastReceiver; //agar activity mendapatkan update kondisi dari service
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
         btnTriggerService.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //for delayed message service
+                //memulai service
                 Intent intent = new Intent(mCtx, DelayedMessageService.class);
                 startService(intent);
                 btnTriggerService.setText("Service is now doing something");
@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
         broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
+                //dilakukan ketika menerima update kondisi dari service
                 btnTriggerService.setText("Service is done doing something, retry?");
             }
         };
@@ -47,13 +48,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        //meregister broadcast receiver
         LocalBroadcastManager.getInstance(this).registerReceiver((broadcastReceiver),
                 new IntentFilter(DelayedMessageService.DELAYEDMESSAGESERVICE_ACTION)
         );
     }
 
     @Override
-    protected void onStop() {
+    protected void onStop() {//menghapus registrasi broadcast receiver
         LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
         super.onStop();
     }

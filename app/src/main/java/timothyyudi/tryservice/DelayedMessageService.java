@@ -22,22 +22,18 @@ public class DelayedMessageService extends IntentService {
     public void onCreate() {
         super.onCreate();
         handler = new Handler();
-        broadcaster = LocalBroadcastManager.getInstance(this);
+        broadcaster = LocalBroadcastManager.getInstance(this); //memanggil BroadcastManager system dari smartphone
     }
 
     @Override
-    public int onStartCommand(@Nullable Intent intent, int flags, int startId) {
+    public int onStartCommand(@Nullable Intent intent, int flags, int startId) { //dipanggil setiap ada intent yang dikirim lewat startService
         Toast.makeText(getApplicationContext(), "Doing something", Toast.LENGTH_SHORT).show();
         return super.onStartCommand(intent, flags, startId);
     }
 
     @Override
-    protected void onHandleIntent(Intent intent) {
-        Toast.makeText(this.getApplicationContext(), "Doing something", Toast.LENGTH_SHORT).show();
-        showDelayedText("Done");
-    }
+    protected void onHandleIntent(Intent intent) { //dipanggil setelah onStartCommand, dilakukan di background thread
 
-    private void showDelayedText(final String text) {
         synchronized (this) {
             try {
                 wait(5000);
@@ -45,13 +41,14 @@ public class DelayedMessageService extends IntentService {
                 e.printStackTrace();
             }
         }
-        handler.post(new Runnable() {
+        handler.post(new Runnable() { //selesai dari background thread, hasil di post ke main thread
             @Override
             public void run() {
-                Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Done", Toast.LENGTH_SHORT).show();
                 broadcaster.sendBroadcast(new Intent(DELAYEDMESSAGESERVICE_ACTION));
             }
         });
+
     }
 
 }
